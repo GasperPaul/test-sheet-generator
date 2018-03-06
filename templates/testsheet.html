@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ name }}</title>
+</head>
+<body>
+	<h1>{{ name }}</h1>
+	<form action="#" method="post">
+		<fieldset>
+			<label for="name">Студент:</label><input type="text" id="name" />
+			<label for="group">Група:</label><input type="text" id="group" />
+		</fieldset>
+		<ol>
+		{%- for question, answers in questions %}
+			{%- set num = loop.index0 %}
+			<li>
+				<fieldset>
+					<label class="question" for="question_{{ num }}">{{ question }}</label>
+					{% if answers|length == 0 -%}
+						<textarea id="question_{{ num }}"></textarea>
+					{%- else -%}
+						{%- for answer in answers -%}
+							<input type="checkbox" id="question_{{ num }}_{{ loop.index0 }}" name="question_{{ num }}[]" value="{{ answer }}" />
+							<label for="question_{{ num }}_{{ loop.index0 }}">{{ answer }}</label>
+							<br />
+						{%- endfor %}
+					{%- endif %}
+				</fieldset>
+			</li>
+		{%- endfor %}
+		</ol>
+	</form>
+	<footer>
+		<p>Seed: {{ seed }}</p>
+		<p>Run: {{ run }}</p>
+		<p>Date: {{ date }}</p>
+	</footer>
+</body>
+</html>
