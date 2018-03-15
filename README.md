@@ -11,11 +11,13 @@ Each question is an object of the form:
     "type": "<type>",
     "question": "<question>",
     "answers": [],
-    "fixed_answers": []
+    "fixed_answers": [],
+	"display_hints": {}
 }
 ```
 
 Here `type` is a string representing a type of the question (see below) and `question` is a text of the question. `answers` and `fixed_answers` are optional arrays of strings.
+`display_hints` is an optional object with front-specific hints. (For example, `pdf` front uses `max_lines` hint for open questions to determine the amount of free space on the page for the answer. Same way, it uses `max_cols` hint for choice questions to determine the number of columns to organize answers into.)
 
 Questions are grouped into pools, that represent sets of questions to draw from. Question pools are objects of the form:
 

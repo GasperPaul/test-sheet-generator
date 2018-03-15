@@ -1,4 +1,4 @@
-from pylatex import Document, PageStyle, Head, LineBreak, MiniPage, NoEscape, Command
+from pylatex import Document, PageStyle, Head, LineBreak, MiniPage, NoEscape, Command, Tabular
 from datetime import datetime
 
 
@@ -69,17 +69,20 @@ class PdfFront(AbstractFront):
 	def _write_questions(self, info):
 		self._doc.append(NoEscape(r'\flushleft'))
 		i = 1
-		for question, answers in info['questions']:
+		for question, answers, hints in info['questions']:
 			with self._doc.create(MiniPage(align='l')):
 				self._doc.append('{}. {}'.format(i, question))
 				self._doc.append(LineBreak())
 				i += 1
 				if len(answers) == 0:
-					self._doc.append(LineBreak())
-				for answer in answers:
-					self._doc.append(NoEscape(r'$\Box~~$'))
-					self._doc.append(answer)
-					self._doc.append(LineBreak())
+					for _ in range(hints.get('max_lines', 1)):
+						self._doc.append(LineBreak())
+				else:
+					l = hints.get('max_cols', 1)
+					table_data = [answers[j:j+l] for j in range(0, len(answers), l)]
+					with self._doc.create(Tabular('l'*l)) as table:
+						for row in table_data:
+							table.add_row(row, mapper = lambda x: NoEscape(r'$\Box~~$') + x, strict=False)
 			self._doc.append(LineBreak())
 		
 	def _save(self, info):
@@ -110,7 +113,7 @@ class PlainFront(AbstractFront):
 
 	def _write_questions(self, info):
 		i = 1
-		for question, answers in info['questions']:
+		for question, answers, _ in info['questions']:
 			self.__doc.write(u'{}. {}\n'.format(i, question))
 			i += 1
 			for answer in answers:

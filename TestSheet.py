@@ -15,7 +15,8 @@ class TestSheet(object):
 		}
 		for pool_name, args in self.__schema:
 			q = self.__pools[pool_name].get_question(rng)
-			result['questions'].append((q.get_question(), q.get_choices(rng, *args)))
+			result['questions'].append((q.get_question(), q.get_choices(rng, *args),
+				q.get_display_hints()))
 		return result
 		
 		
@@ -26,12 +27,7 @@ class TestSheet(object):
 		name = obj['name']
 		pools = {}
 		for pool in obj['pools']:
-			questions = []
-			for question in pool['questions']:
-				questions.append(create_question(question['type'], 
-					question = question["question"], 
-					answers = question.get("answers"),
-					fixed_answers = question.get("fixed_answers")))
+			questions = [create_question(**question) for question in pool['questions']]
 			pools[pool['name']] = create_question_pool(pool['type'], 
 				name = pool['name'],
 				questions = questions)

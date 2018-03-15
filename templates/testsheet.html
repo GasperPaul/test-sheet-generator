@@ -11,13 +11,13 @@
 			<label for="group">Група:</label><input type="text" id="group" />
 		</fieldset>
 		<ol>
-		{%- for question, answers in questions %}
+		{%- for question, answers, hints in questions %}
 			{%- set num = loop.index0 %}
 			<li>
 				<fieldset>
 					<label class="question" for="question_{{ num }}">{{ question }}</label>
 					{% if answers|length == 0 -%}
-						<textarea id="question_{{ num }}"></textarea>
+						<textarea id="question_{{ num }}" rows="{{ hints.get('max_lines', 1) }}"></textarea>
 					{%- else -%}
 						{%- for answer in answers -%}
 							<input type="checkbox" id="question_{{ num }}_{{ loop.index0 }}" name="question_{{ num }}[]" value="{{ answer }}" />

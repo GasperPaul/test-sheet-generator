@@ -1,6 +1,7 @@
 class OpenQuestion(object):
-	def __init__(self, question, **kwargs):
+	def __init__(self, question, display_hints = {}, **kwargs):
 		self._question = question
+		self._display_hints = display_hints
 		
 	def get_question(self):
 		return self._question
@@ -11,13 +12,16 @@ class OpenQuestion(object):
 	def get_choices(self, *args):
 		return []
 		
+	def get_display_hints(self):
+		return self._display_hints
+		
 	def __str__(self):
 		return self.get_question()
 		
 
 class ChoiceQuestion(OpenQuestion):
 	def __init__(self, question, answers, **kwargs):
-		self._question = question
+		super().__init__(question, **kwargs)
 		self.__answers = answers
 		
 	def get_answers(self):
@@ -28,8 +32,8 @@ class ChoiceQuestion(OpenQuestion):
 		
 
 class FixedChoiceQuestion(ChoiceQuestion):
-	def __init__(self, question, answers, fixed_answers):
-		super().__init__(question, answers)
+	def __init__(self, question, answers, fixed_answers, **kwargs):
+		super().__init__(question, answers, **kwargs)
 		self.__fixed_answers = fixed_answers
 		
 	def get_answers(self):
