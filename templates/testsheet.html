@@ -11,15 +11,22 @@
 			<label for="group">Група:</label><input type="text" id="group" />
 		</fieldset>
 		<ol>
-		{%- for question, answers, hints in questions %}
+		{%- for question, answers, options in questions %}
 			{%- set num = loop.index0 %}
 			<li>
 				<fieldset>
 					<label class="question" for="question_{{ num }}">{{ question }}</label>
-					{% if answers|length == 0 -%}
-						<textarea id="question_{{ num }}" rows="{{ hints.get('max_lines', 1) }}"></textarea>
+					{%- if options['images']|length != 0%}
+						<div class="images">
+						{%- for image in options['images'] %}
+							<img src="{{ image['src'] }}" alt="{{ image.get('description', '') }}" width="{{ image.get('width', 100) }}px" />
+						{%- endfor %}
+						</div>
+					{%- endif %}
+					{%- if answers|length == 0 -%}
+						<textarea id="question_{{ num }}" rows="{{ options['hints'].get('max_lines', 1) }}"></textarea>
 					{%- else -%}
-						{%- for answer in answers -%}
+						{%- for answer in answers %}
 							<input type="checkbox" id="question_{{ num }}_{{ loop.index0 }}" name="question_{{ num }}[]" value="{{ answer }}" />
 							<label for="question_{{ num }}_{{ loop.index0 }}">{{ answer }}</label>
 							<br />

@@ -16,7 +16,10 @@ class TestSheet(object):
 		for pool_name, args in self.__schema:
 			q = self.__pools[pool_name].get_question(rng)
 			result['questions'].append((q.get_question(), q.get_choices(rng, *args),
-				q.get_display_hints()))
+				{
+					'hints': q.get_display_hints(), 
+					'images': q.get_images()
+				}))
 		return result
 		
 		

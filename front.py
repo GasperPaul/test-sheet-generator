@@ -1,4 +1,4 @@
-from pylatex import Document, PageStyle, Head, LineBreak, MiniPage, NoEscape, Command, Tabular
+from pylatex import Document, PageStyle, Head, LineBreak, NewLine, NoEscape, Command, Tabular, Figure
 from datetime import datetime
 
 
@@ -69,20 +69,24 @@ class PdfFront(AbstractFront):
 	def _write_questions(self, info):
 		self._doc.append(NoEscape(r'\flushleft'))
 		i = 1
-		for question, answers, hints in info['questions']:
-			with self._doc.create(MiniPage(align='l')):
-				self._doc.append('{}. {}'.format(i, question))
-				self._doc.append(LineBreak())
-				i += 1
-				if len(answers) == 0:
-					for _ in range(hints.get('max_lines', 1)):
-						self._doc.append(LineBreak())
-				else:
-					l = hints.get('max_cols', 1)
-					table_data = [answers[j:j+l] for j in range(0, len(answers), l)]
-					with self._doc.create(Tabular('l'*l)) as table:
-						for row in table_data:
-							table.add_row(row, mapper = lambda x: NoEscape(r'$\Box~~$') + x, strict=False)
+		for question, answers, options in info['questions']:
+			self._doc.append('{}. {}'.format(i, question))
+			self._doc.append(LineBreak())
+			for image in options['images']:
+				with self._doc.create(Figure(position='h!')) as fig:
+					fig.add_image(image['src'], width='{}px'.format(image.get('width', 100)))
+					if image.get('description'):
+						fig.add_caption(image.get('description'))
+			i += 1
+			if len(answers) == 0:
+				for _ in range(options['hints'].get('max_lines', 1)):
+					self._doc.append(NewLine())
+			else:
+				l = options['hints'].get('max_cols', 1)
+				table_data = [answers[j:j+l] for j in range(0, len(answers), l)]
+				with self._doc.create(Tabular('l'*l)) as table:
+					for row in table_data:
+						table.add_row(row, mapper = lambda x: NoEscape(r'$\Box~~$') + x, strict=False)
 			self._doc.append(LineBreak())
 		
 	def _save(self, info):

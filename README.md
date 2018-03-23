@@ -4,6 +4,8 @@ This is a simple tool to prepare test sheets. It uses JSON schemas to represent 
 
 ## JSON schema
 
+### Questions
+
 Each question is an object of the form:
 
 ```json
@@ -12,12 +14,31 @@ Each question is an object of the form:
     "question": "<question>",
     "answers": [],
     "fixed_answers": [],
-	"display_hints": {}
+    "images": [],
+    "display_hints": {}
 }
 ```
 
-Here `type` is a string representing a type of the question (see below) and `question` is a text of the question. `answers` and `fixed_answers` are optional arrays of strings.
+Here `type` is a string representing a type of the question (see below) and `question` is a text of the question. `answers` and `fixed_answers` are optional arrays of strings. `images` is an optional array of image objects.
 `display_hints` is an optional object with front-specific hints. (For example, `pdf` front uses `max_lines` hint for open questions to determine the amount of free space on the page for the answer. Same way, it uses `max_cols` hint for choice questions to determine the number of columns to organize answers into.)
+
+### Image objects
+
+Each image attached to a question is described by an object of the form:
+
+```json
+{
+    "name": "<name>",
+    "src": "<src_path>",
+    "description": "<description>",
+    "width": 0,
+    "height": 0
+}
+```
+
+Only `src` field is mandatory and specifies the path to the image. Fronts treat other fields as hints and are allowed to skip them when rendering.
+
+### Question pools
 
 Questions are grouped into pools, that represent sets of questions to draw from. Question pools are objects of the form:
 
@@ -31,6 +52,8 @@ Questions are grouped into pools, that represent sets of questions to draw from.
 
 `name` is a unique id of the pool inside current schema used to reference it in the rules. `type` is a string specifying a type of pool (see below). `questions` is an array of question objects.
 
+### Test sheets
+
 Each test sheet template contains a number of pools and rules that describe the resulting test sheet. It has following structure:
 
 ```json
@@ -39,7 +62,7 @@ Each test sheet template contains a number of pools and rules that describe the 
     "schema": [
 		{ "pool_name": "<name>", "args": [] }
 	],
-	"pools": []
+    "pools": []
 }
 ```
 

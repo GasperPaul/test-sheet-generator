@@ -1,7 +1,8 @@
 class OpenQuestion(object):
-	def __init__(self, question, display_hints = {}, **kwargs):
+	def __init__(self, question, display_hints = {}, images = [], **kwargs):
 		self._question = question
 		self._display_hints = display_hints
+		self._images = images
 		
 	def get_question(self):
 		return self._question
@@ -14,6 +15,9 @@ class OpenQuestion(object):
 		
 	def get_display_hints(self):
 		return self._display_hints
+		
+	def get_images(self):
+		return self._images
 		
 	def __str__(self):
 		return self.get_question()
