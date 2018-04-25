@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
 	args = parser.parse_args()
 
-	with open(args.filename) as file:
+	with open(args.filename, encoding='utf-8') as file:
 		template = TestSheet.from_json(file)
 
 	rng = Random()
