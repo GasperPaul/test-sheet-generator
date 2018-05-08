@@ -1,0 +1,82 @@
+%\documentclass[a4paper,14pt,ukrainian,oneside]{extreport}
+\documentclass{article}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ukrainian]{babel}
+\usepackage{pscyr}
+
+\usepackage{amsfonts,amssymb,amsmath, amsthm}
+\usepackage{textcomp}
+\usepackage{graphicx}
+
+\usepackage[margin=2.0cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+
+\newcommand{\therun}{0}
+\newcommand{\theseed}{0}
+\newcommand{\thename}{0}
+\newcommand{\thedate}{0}
+
+\fancypagestyle{plain}{
+	\renewcommand{\headrulewidth}{0pt}
+	\renewcommand{\footrulewidth}{0pt}
+	
+	\lhead{
+		\thename
+		\linebreak
+		Date: \thedate
+		\linebreak
+		Студент: \___________________________
+	}
+	
+	\rhead{
+		Seed: \theseed
+		\linebreak
+		Run: \therun
+		\linebreak
+		Група: \____________
+	}
+}
+
+\renewcommand{\rmdefault}{ftm}
+\setlist[enumerate,1]{\label=\arabic*., partopsep=0pt, parsep=0pt, topsep=0pt, itemsep=0pt, itemindent=0pt, leftmargin=0pt}
+
+\begin{document}
+\pagestyle{plain}
+
+{%- for info in batch %}
+	\renewcommand{\thename}{ {{- info.name -}} }
+	\renewcommand{\theseed}{ {{- info.seed -}} }
+	\renewcommand{\therun}{ {{- info.run -}} }
+	\renewcommand{\thedate}{ {{- info.date -}} }
+
+	\begin{enumerate}
+	{%- for question, answers, options in info.questions %}
+		\item {{ question }}
+		{%- if options['images']|length != 0 -%}
+			{% for image in options['images'] %}
+				\begin{figure}[!h]
+					\centering
+					\includegraphics[width={{ image.get('width', 100) }}px]{ {{- image.src -}} }
+					%\caption{ {{- image.get('description', '') -}} }
+				\end{figure}
+			{%- endfor -%}
+		{% endif %}
+		{%- if answers|length == 0 %}
+			\vspace*{ {{- options.hints.get('max_lines', 1) }}\baselineskip}
+			\vspace{-\parskip}
+		{%- else %}
+			{%- set l = options.hints.get('max_cols', 1) %}
+			\begin{tabular}{ {{- 'l'*l -}} }
+			{%- for row in answers|batch(l) %}
+				$\Box~~${{ row|join(' & $\Box~~$'|safe) }}\\
+			{%- endfor %}
+			\end{tabular}
+		{%- endif %}
+	{%- endfor %}
+	\end{enumerate}
+	\clearpage
+{%- endfor %}
+\end{document}

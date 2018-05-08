@@ -144,14 +144,13 @@ class TemplateFront(AbstractFront):
 			autoescape=select_autoescape(self.AUTOESCAPE)
 		)
 		self.__doc = env.get_template(self.TEMPLATE_NAME)
-	
-	def _write_questions(self, info):
-		info['date'] = self._date()
-		self._set_render(self.__doc.render(info))
 		
 	def _save(self, info):
 		with open(self._filename(info), 'w', encoding='utf-8') as file:
 			file.write(self._get_render())
+			
+	def _render(self, info):
+		self._set_render(self.__doc.render(info))
 			
 	@property
 	def _rendername(self):
@@ -167,6 +166,10 @@ class HtmlFront(TemplateFront):
 	FILE_EXTENSION = 'html'
 	AUTOESCAPE = ['html', 'xml']
 	TEMPLATE_NAME = 'testsheet.html'
+
+	def process(self, info):
+		info['date'] = self._date()
+		self._render(info)
 
 	def process_batch(self, batch, filename):
 		for info in batch:
@@ -185,7 +188,9 @@ class TexTemplateFront(TemplateFront):
 			self._filename = lambda info : '{}_{}.{}'.format(info['name'], info['seed'], self.FILE_EXTENSION)
 		else:
 			self._filename = lambda info : '{}.{}'.format(filename, self.FILE_EXTENSION)
-		self._write_questions(batch)
+		for info in batch:
+			info['date'] = self._date()
+		self._render({ 'batch' : batch })
 		self._save(batch[0])
 
 
