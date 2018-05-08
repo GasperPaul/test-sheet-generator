@@ -133,31 +133,60 @@ class PlainFront(AbstractFront):
 		
 	def _add_page_separator(self):
 		self.__doc.write(u'='*PlainFront.WIDTH+u'\n\n')
-	
-class HtmlFront(AbstractFront):
-	FILE_EXTENSION = 'html'
+		
+class TemplateFront(AbstractFront):
 	TEMPLATE_PATH = './templates'
-	TEMPLATE_NAME = 'testsheet.html'
 	
 	def __init__(self):
 		from jinja2 import Environment, FileSystemLoader, select_autoescape
 		env = Environment(
-			loader=FileSystemLoader(HtmlFront.TEMPLATE_PATH),
-			autoescape=select_autoescape(['html', 'xml'])
+			loader=FileSystemLoader(self.TEMPLATE_PATH),
+			autoescape=select_autoescape(self.AUTOESCAPE)
 		)
-		self.__doc = env.get_template(HtmlFront.TEMPLATE_NAME)
+		self.__doc = env.get_template(self.TEMPLATE_NAME)
 	
 	def _write_questions(self, info):
 		info['date'] = self._date()
-		self.__html = self.__doc.render(info)
+		self._set_render(self.__doc.render(info))
 		
 	def _save(self, info):
 		with open(self._filename(info), 'w', encoding='utf-8') as file:
-			file.write(self.__html)
-	
+			file.write(self._get_render())
+			
+	@property
+	def _rendername(self):
+		return '_{}__{}'.format(type(self).__name__, self.FILE_EXTENSION)
+		
+	def _get_render(self):
+		return getattr(self, self._rendername)
+		
+	def _set_render(self, value):
+		setattr(self, self._rendername, value)
+		
+class HtmlFront(TemplateFront):
+	FILE_EXTENSION = 'html'
+	AUTOESCAPE = ['html', 'xml']
+	TEMPLATE_NAME = 'testsheet.html'
+
 	def process_batch(self, batch, filename):
 		for info in batch:
 			self.process(info)
+			
+class TexTemplateFront(TemplateFront):
+	FILE_EXTENSION = 'tex'
+	AUTOESCAPE = ['tex']
+	TEMPLATE_NAME = 'testsheet.tex'
+	
+	def process(self, info):
+		self.process_batch([info])
+	
+	def process_batch(self, batch, filename=None):
+		if filename is None:
+			self._filename = lambda info : '{}_{}.{}'.format(info['name'], info['seed'], self.FILE_EXTENSION)
+		else:
+			self._filename = lambda info : '{}.{}'.format(filename, self.FILE_EXTENSION)
+		self._write_questions(batch)
+		self._save(batch[0])
 
 
 def create_front(type):
@@ -167,6 +196,8 @@ def create_front(type):
 		return TexFront()
 	elif type == 'html':
 		return HtmlFront()
+	elif type == 'tex-jinja':
+		return TexTemplateFront()
 	elif type == 'plaintext':
 		return PlainFront()
 	else:

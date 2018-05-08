@@ -5,8 +5,8 @@ from random import randrange, Random
 from TestSheet import TestSheet
 from front import create_front
 
-VERSION = 1.0
-FRONTS = ['pdf','tex','html','plaintext']
+VERSION = 1.1
+FRONTS = ['pdf','tex','tex-jinja','html','plaintext']
 
 
 if __name__ == '__main__':
