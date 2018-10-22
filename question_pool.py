@@ -18,11 +18,15 @@ class ExhaustQuestionPool(QuestionPool):
 		super().__init__(name, questions)
 		self.__exaust_pool = []
 		self.__exaust_strategy = exaust_strategy
+		self.__prev_question = None
 		
 	def get_question(self, rng):
 		if len(self._questions) == 0:
 			self.__reset()
 		q = super().get_question(rng)
+		while q == self.__prev_question:
+			q = super().get_question(rng)
+		self.__prev_question = q
 		if self.__exaust_strategy(self, q):
 			self._questions.remove(q)
 			self.__exaust_pool.append(q)

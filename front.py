@@ -177,7 +177,7 @@ class HtmlFront(TemplateFront):
 			
 class TexTemplateFront(TemplateFront):
 	FILE_EXTENSION = 'tex'
-	AUTOESCAPE = ['tex']
+	AUTOESCAPE = []
 	TEMPLATE_NAME = 'testsheet.tex'
 	
 	def process(self, info):
